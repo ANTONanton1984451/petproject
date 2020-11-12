@@ -1,0 +1,71 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.b-white{
+    background-color: white;
+}
+.b-black{
+    background-color: #1A1A1B;
+}
+.t-white{
+    color:white!important;
+}
+.t-white:hover{
+    color:white;
+}
+.t-black{
+    color:black!important;
+}
+.t-black:hover{
+    color:black;
+}
+.app-white{
+    background-color: #e4e0ff;
+}
+.app-black{
+    background-color: black;
+}
+.fake-link{
+    color:#3490dc;
+}
+.fake-link:hover{
+    text-decoration: underline;
+    cursor:pointer;
+}
+.btn-bg-dark{
+    background-color: #29292a;
+}
+.btn-bg-light{
+    background-color: #d1cedb;
+}
+.btn-active{
+    background-color: rgba(109, 109, 109, 0.6);
+}
+.opacity{
+    background-color: rgba(52, 52, 52, 0.6);
+}
+.component-wrapper{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+.active{
+    background-color: rgba(121, 121, 121, 0.61);
+}
+.notification{
+    position: fixed;
+    text-align: center;
+    width: 170px;
+    height: 100px;
+    left: 45%;
+    top:55px;
+    background-color: rgba(52, 52, 52, 0.6);
+    border-radius: 7px;
+}
+
