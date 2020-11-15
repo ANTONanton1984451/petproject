@@ -93,7 +93,7 @@ class Post extends Model
                     ->with('user');
     }
 
-    public function scopeAlreadyVoted(object $query,int $userId):bool
+    public function scopeAlreadyVoted($query,int $userId):bool
     {
         return $this->belongsToMany(User::class,'votes')
                     ->where('votes.user_id',$userId)

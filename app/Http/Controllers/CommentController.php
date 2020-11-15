@@ -21,7 +21,14 @@ class CommentController extends Controller
         ]);
 
         if(!$validator->fails()){
-            $comments = Comment::$sortMethod(+$tredId)->simplePaginate(5)->withQueryString();
+            $comments = Comment::$sortMethod(+$tredId);
+            if(!Auth::guest()){
+               $comments = $comments->with(['votes'=>function($query){
+                   $query->select('comment_votes.vote_type')
+                       ->where('comment_votes.user_id',2);
+               }]);
+               $comments = $comments->simplePaginate(2)->withQuerystring();
+            }
         }else{
             $comments = 'Неверный метод сортировки';
         }
@@ -36,8 +43,16 @@ class CommentController extends Controller
         }catch (ModelNotFoundException $e){
             return response('Данного коментария не существует',404);
         }
-        $commentInstance->increment('to_top');
-        return response('',204);
+        if(!$commentInstance->alreadyVoted(Auth::id())){
+            $commentInstance->votes()->attach(Auth::id(),['vote_type'=>'TOP']);
+            $commentInstance->increment('to_top');
+
+            $response = response('',204);
+        }else{
+            $response = response('Вы уже ставили оценку',406);
+        }
+            return $response;
+
     }
 
     public function commentDown($commentId)
@@ -47,8 +62,15 @@ class CommentController extends Controller
         }catch (ModelNotFoundException $e){
             return response('Данного коментария не существует',404);
         }
-        $commentInstance->increment('to_down');
-        return response('',204);
+        if(!$commentInstance->alreadyVoted(Auth::id())){
+            $commentInstance->votes()->attach(Auth::id(),['vote_type'=>'DOWN']);
+            $commentInstance->increment('to_top');
+
+            $response = response('',204);
+        }else{
+            $response = response('Вы уже ставили оценку',406);
+        }
+        return $response;
     }
 
     public function addComment(Request $request,$tredId)

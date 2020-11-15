@@ -82,9 +82,7 @@ Route::get('/post/{id}/saved',function($id) {
     ];
 });
 
-Route::post('/post/publish',function (Request  $request) {
-    return ['ответ'=>$request->all()];
-});
+Route::post('/post/publish',[\App\Http\Controllers\PostController::class,'dispatchHandler']);
 
 Route::patch('/post/save',function (Request $request) {
     return ['status'=>$request->all()];

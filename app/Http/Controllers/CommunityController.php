@@ -44,13 +44,15 @@ class CommunityController extends Controller
     {
         try{
             $communityInstance = Community::findOrFail($communityId);
+            //кидает исключения
+//            $communityInstance->increment('subscribers');
         }catch (ModelNotFoundException $e){
             return response('',404);
         }
         $isAlreadyJoin = $communityInstance->isJoin(Auth::id());
         if(!$isAlreadyJoin){
             $communityInstance->subscribers()->attach(Auth::id());
-            $communityInstance->increment('subscribers');
+//            $communityInstance->increment('subscribers');
             $response = response('',204);
         }else{
             $response = response('You have already join',406);

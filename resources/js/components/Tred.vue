@@ -97,6 +97,7 @@
                                     :view_count="value.view_count"
                                     :user="value.user"
                                     :date="value.date"
+                                    :vote="value.votes"
                                     :to_top = "value.to_top"
                                     :to_down = "value.to_down"
                                     :text="value.text"
@@ -307,12 +308,14 @@
             },
 
             addNewComment(addCommentResponse){
-              let moment = require('moment'),
-              newComment = {
-                  view_count: 0,
+            let newComment = {
+                  to_top : 0,
+                  to_down : 0,
+                  comments_count: 0,
                   user : addCommentResponse.data.user,
                   date : addCommentResponse.data.created_at,
-                  text: addCommentResponse.data.text
+                  text: addCommentResponse.data.text,
+                  id : addCommentResponse.data.id
               }
               this.comments.unshift(newComment);
               this.post.comments_count +=1;

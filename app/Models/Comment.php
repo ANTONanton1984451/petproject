@@ -24,6 +24,11 @@ class Comment extends Model
       return $this->belongsTo(Post::class);
     }
 
+    public function votes()
+    {
+        return $this->belongsToMany(User::class,'comment_votes');
+    }
+
     public function scopeAlreadyHas($query, ?int $user_id, int $post_id) :bool
     {
         return $query->where([
@@ -48,7 +53,6 @@ class Comment extends Model
         ])
         ->with('user:name,id')
         ->orderBy('created_at');
-
     }
 
     public function scopeTop($query,int $post_id)
@@ -61,5 +65,13 @@ class Comment extends Model
             ->with('user:name,id')
             ->orderBy('top_result','desc');
 
+    }
+
+    public function scopeAlreadyVoted($query,int $userId):bool
+    {
+        return $this->belongsToMany(User::class,'comment_votes')
+            ->where('comment_votes.user_id',$userId)
+            ->get()
+            ->isNotEmpty();
     }
 }

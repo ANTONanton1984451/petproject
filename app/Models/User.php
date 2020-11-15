@@ -64,6 +64,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Post::class,'votes')->withTimestamps();
     }
 
+    public function voted_comments()
+    {
+        return $this->belongsToMany(Comment::class,'comment_votes');
+    }
+
     public function subscriptions()
     {
         return $this->belongsToMany(Community::class,'subscriptions');

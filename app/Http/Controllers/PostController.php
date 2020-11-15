@@ -68,4 +68,9 @@ class PostController extends Controller
 
         return $response;
     }
+
+    public function dispatchHandler(Request $request)
+    {
+
+    }
 }

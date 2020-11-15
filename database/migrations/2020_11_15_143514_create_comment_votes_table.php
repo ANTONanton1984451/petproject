@@ -16,6 +16,17 @@ class CreateCommentVotesTable extends Migration
         Schema::create('comment_votes', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->enum('vote_type',['TOP','DOWN']);
+
+            $table->foreignId('comment_id')
+                ->references('id')
+                ->on('comments')
+                ->cascadeOnDelete();
+
+            $table->foreignId('user_id')
+                ->references('id')
+                ->on('users')
+                ->cascadeOnDelete();
         });
     }
 
