@@ -1,9 +1,19 @@
 <template>
     <div  :class="[toggleBackGround,toggleTextColor]" class="post col-12 my-1" :id="id">
-                   <span class="left-up-down-bar d-md-flex d-none">
+                   <span v-if="voted.length === 0 || voted === undefined " class="left-up-down-bar d-md-flex d-none">
                        <img class="to-up" @click.prevent.once="toTop" src="\images\arrow-up.svg">
-                       <span class="views">{{views}}</span>
+                       <span class="views">{{votes}}</span>
                        <img class="to-down" @click.prevent.once="toDown" src="\images\arrow-down.svg">
+                   </span>
+                   <span v-else-if="voted[0].vote_type === 'TOP'" class="left-up-down-bar d-md-flex d-none">
+                       <img class="to-up"  src="\images\arrow-up.svg" style="display:none">
+                       <span class="views">{{votes}}</span>
+                       <img class="to-down"  src="\images\arrow-down.svg">
+                   </span>
+                   <span v-else-if="voted[0].vote_type === 'DOWN'" class="left-up-down-bar d-md-flex d-none">
+                       <img class="to-up"  src="\images\arrow-up.svg" style="display:none">
+                       <span class="views">{{votes}}</span>
+                       <img class="to-down" src="\images\arrow-down.svg">
                    </span>
         <router-link :to="{name:'tred',params:{tredId:post_id},query:{sort:'new'}}"
                      :class="[toggleTextColor]"
@@ -26,10 +36,18 @@
                 {{title}}
             </div>
             <div class="row comment align-items-center">
-                <div class="bottom-up-down-bar align-items-center d-flex d-md-none">
+                <div v-if="voted.length === 0" class="bottom-up-down-bar align-items-center d-flex d-md-none">
                     <img class="to-up" @click.prevent.once="toTop" src="\images\arrow-up.svg">
-                    <span class="views">{{views}}</span>
+                    <span class="views">{{votes}}</span>
                     <img class="to-down" @click.prevent.once="toDown" src="\images\arrow-down.svg">
+                </div>
+                <div v-else-if="voted[0].vote_type === 'TOP'" class="bottom-up-down-bar align-items-center d-flex d-md-none">
+                    <img class="to-up" src="\images\arrow-up.svg">
+                    <span class="views">{{votes}}</span>
+                </div>
+                <div v-else-if="voted[0].vote_type === 'DOWN'" class="bottom-up-down-bar align-items-center d-flex d-md-none">
+                    <span class="views">{{votes}}</span>
+                    <img class="to-down" src="\images\arrow-down.svg">
                 </div>
                 <img class="comment-img mx-1" src="\images\comment.svg">
                 <span class="comment-count p-1">{{comments_count}} коментарии</span>
@@ -45,16 +63,33 @@
 
     export default {
         name: "one-post",
-        props:['date','user','comments_count','view_count','title','post_id','community'],
+        // props:['date','user','comments_count','to_top','to_down','title','post_id','community','voted'],
+        props : {
+            date : String,
+            user : Object,
+            comments_count : Number,
+            to_top : Number,
+            to_down : Number,
+            title : String,
+            post_id : Number,
+            community : Object,
+            voted: {
+                type : Array,
+                default : function (){
+                    return []
+                }
+            }
+        },
         mixins:[colorToggle,formDate],
         data(){
             return{
-                views : this.view_count
+                top : this.to_top,
+                down : this.to_down
             }
         },
         methods : {
           ban(){
-             axios.post(`api/tred/${this.post_id}/ban`)
+             axios.post(`/api/tred/${this.post_id}/ban`)
              .then(this.removeMe)
              .catch(e=>{
                 console.log(e);
@@ -68,7 +103,7 @@
           doToTop(response) {
             let selector = '#post-'+this.post_id + ' .to-down';
             let downArrows = document.querySelectorAll(selector);
-            this.views +=1;
+            this.top +=1;
             downArrows.forEach(function (value){
                value.style.display = 'none'
             });
@@ -76,7 +111,7 @@
           doToDown(){
               let selector = '#post-'+this.post_id + ' .to-up';
               let upArrows = document.querySelectorAll(selector);
-              this.views -=1;
+              this.down +=1;
               upArrows.forEach(function (value){
                   value.style.display = 'none'
               });
@@ -89,7 +124,7 @@
              })
           },
           toDown(){
-              axios.post(`/api/post/${this.post_id}/down`)
+              axios.patch(`/api/post/${this.post_id}/down`)
               .then(this.doToDown)
               .catch(error => {
                   console.log(error);
@@ -99,7 +134,12 @@
         computed : {
             id(){
                 return 'post-' + this.post_id;
-            }
+            },
+            votes(){
+                return this.top - this.down;
+            },
+        },
+        mounted(){
         }
     }
 </script>

@@ -50,6 +50,7 @@ class CommunityController extends Controller
         $isAlreadyJoin = $communityInstance->isJoin(Auth::id());
         if(!$isAlreadyJoin){
             $communityInstance->subscribers()->attach(Auth::id());
+            $communityInstance->increment('subscribers');
             $response = response('',204);
         }else{
             $response = response('You have already join',406);

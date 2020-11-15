@@ -2,7 +2,7 @@
     <div class="comment my-2 row" :id="commentId">
         <div class="up-down d-none d-md-block  h-100 col-1">
             <img class="to-top" @click.once="toTop" src="\images\arrow-up.svg">
-            <span class="views">{{views_count_computed}}</span>
+            <span class="views">{{votes}}</span>
             <img class="to-down" @click.once="toDown" src="\images\arrow-down.svg">
         </div>
         <div class="d-flex flex-column align-items-start col-11">
@@ -13,7 +13,7 @@
                     class="user">Опубликовано {{user.name}} &bull;</router-link>   {{date|formNotTimestampDate}}
                 <div class="bottom-up-down-bar d-flex d-md-none">
                     <img class="to-top" @click.once="toTop" src="\images\arrow-up.svg">
-                    <span class="views">{{views_count_computed}}</span>
+                    <span class="views">{{votes}}</span>
                     <img class="to-down" @click.once="toDown" src="\images\arrow-down.svg">
                 </div>
             </div>
@@ -27,25 +27,26 @@
 <script>
 import {formDate} from "../mixins/formDate"
 export default {
-    props:['view_count','user','date','text','id'],
+    props:['to_top','to_down','user','date','text','id'],
     name: "Comment",
     mixins : [formDate],
     data(){
         return {
-
+            top : this.to_top,
+            down : this.to_down
         }
     },
     methods : {
         doToTop(){
           let selector = '#'+this.commentId+' .to-down';
-          this.view_count +=1;
+          this.top +=1;
           document.querySelectorAll(selector).forEach(value => {
               value.style.display = 'none';
           });
         },
         doToDown(){
             let selector = '#'+this.commentId+' .to-top';
-            this.view_count -=1;
+            this.down +=1;
             document.querySelectorAll(selector).forEach(value => {
                 value.style.display = 'none';
             });
@@ -69,8 +70,8 @@ export default {
         commentId(){
             return 'comment'+this.id;
         },
-        views_count_computed(){
-            return this.view_count;
+        votes(){
+            return this.top - this.down;
         }
     }
 }

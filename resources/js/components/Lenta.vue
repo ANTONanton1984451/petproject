@@ -12,13 +12,15 @@
         <div  class="d-flex row col-md-10 col-12  align-items-start  my-2" :class="toggle_BG_APP">
             <div class="col-md  col-12 posts-wrapper ">
                 <one-post v-for="(post,key) in posts"
-                          :date="post.created_at"
-                          :user="post.user"
-                          :community="post.community"
-                          :comments_count="post.comments_count"
-                          :view_count="post.view_count"
-                          :title="post.title"
-                          :post_id="post.id"
+                          :date = "post.created_at"
+                          :user = "post.user"
+                          :community = "post.community"
+                          :comments_count = "post.comments_count"
+                          :to_top = "post.to_top"
+                          :to_down = "post.to_down"
+                          :title = "post.title"
+                          :post_id = "post.id"
+                          :voted = "post.voted_users"
                 />
             </div>
             <div class="col-auto d-none d-lg-flex flex-column">
@@ -58,7 +60,8 @@
             return{
                 auth : 'fake',
                 posts : [],
-                communities : []
+                communities : [],
+                next_page_posts_url : ''
             }
         },
         beforeMount() {
@@ -80,12 +83,20 @@
         methods: {
             setLenta(posts){
                 this.posts = posts.data.data;
-                console.log(this.posts);
+                this.next_page_posts_url = posts.data.next_page_url;
+                if(posts.data.next_page_url === null){
+                    window.removeEventListener('scroll',this.handleScroll);
+                }
             },
 
             addToLenta(additionalPosts){
-                this.posts.push.apply(this.posts,additionalPosts.data);
-                window.addEventListener('scroll',this.handleScroll);
+                this.posts.push.apply(this.posts,additionalPosts.data.data);
+
+                if(additionalPosts.data.next_page_url !== null){
+                    this.next_page_posts_url = additionalPosts.data.next_page_url;
+                    window.addEventListener('scroll',this.handleScroll);
+                }
+
             },
 
             setCommunities(communitiesObj) {
@@ -99,12 +110,12 @@
 
                 if((windowHeight+scrollHeight)>fullHeight){
                     window.removeEventListener('scroll',this.handleScroll);
-                    axios.get('/api/lenta')
+                    axios.get(this.next_page_posts_url)
                     .then(this.addToLenta)
                 }
 
             }
-        }
+        },
 
 
     }

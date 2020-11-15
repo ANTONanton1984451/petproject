@@ -15,9 +15,14 @@ class TredController extends Controller
         try{
             $mainPost = Post::findOrFail(+$tredId);
             $mainPost->user;
+
+            if(!Auth::guest()){
+                $mainPost->votedUsers->where('user_id','=',Auth::id());
+            }
+
             $community = $mainPost->community;
             //todo :: проверить работу при большом количестве подписок
-            $isJoin = Auth::check() ? false : Auth::user()
+            $isJoin = Auth::guest() ? false : Auth::user()
                                               ->subscriptions()
                                               ->where('community_id',$community->id)
                                               ->get()
@@ -28,8 +33,11 @@ class TredController extends Controller
 
         $hasComment = Comment::alreadyHas(Auth::id(),$mainPost->id);
 
-        $otherPosts = $mainPost->othersWithBans(Auth::id())->limit(5)->with('user:name,id')->get()->toArray();
+        $otherPosts = Auth::guest() ?
+                    $mainPost->othersWithoutBans()->limit(5)->get() :
+                    $mainPost->othersWithBans(Auth::id())->limit(5)->get();
 
+        $mainPost->increment('views');
         return response([
              'main_post'=>$mainPost,
              'is_joined'=>$isJoin,
@@ -46,7 +54,10 @@ class TredController extends Controller
         }catch (ModelNotFoundException $e){
             return response('тред не найден',404);
         }
+        $otherPosts = Auth::guest() ?
+            $mainPost->othersWithoutBans()->limit(5)->get() :
+            $mainPost->othersWithBans(Auth::id())->limit(5)->get();
 
-        return response($mainPost->othersWithBans(Auth::id())->limit(5)->with('user:name,id')->simplePaginate(5));
+        return response($otherPosts);
     }
 }

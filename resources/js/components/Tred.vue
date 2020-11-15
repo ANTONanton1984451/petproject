@@ -4,10 +4,18 @@
             <div class="column-wrapper col  mr-lg-4" :class="toggleTextColor">
                 <div class="column-wrapper px-1 w-100 py-3" :class="toggleBackGround">
                     <div class="row col-12 px-0">
-                        <div class="up-down d-none d-md-block h-100 col-1">
+                        <div v-if="post.voted_users.length === 0" class="up-down d-none d-md-block h-100 col-1">
                             <img class="to-top" @click.once="toTop" src="\images\arrow-up.svg">
-                            <span class="views">{{post.view_count}}</span>
+                            <span class="views">{{votes}}</span>
                             <img class="to-down" @click.once="toDown" src="\images\arrow-down.svg">
+                        </div>
+                        <div v-else-if="post.voted_users[0].vote_type === 'TOP'" class="up-down d-none d-md-block h-100 col-1">
+                            <img class="to-top"  src="\images\arrow-up.svg">
+                            <span class="views">{{votes}}</span>
+                        </div>
+                        <div v-else-if="post.voted_users[0].vote_type === 'DOWN'" class="up-down d-none d-md-block h-100 col-1">
+                            <span class="views">{{votes}}</span>
+                            <img class="to-down" src="\images\arrow-down.svg">
                         </div>
                         <div class="post-body col">
                             <div class="posted-by">
@@ -20,10 +28,18 @@
                                 {{post.body}}
                             </div>
                             <div class="service-info row align-items-center p-2">
-                                <div class="bottom-up-down-bar d-flex d-md-none">
+                                <div v-if="post.voted_users.length === 0" class="bottom-up-down-bar d-flex d-md-none">
                                     <img class="to-top" @click.once="toTop" src="\images\arrow-up.svg">
-                                    <span class="views">{{post.view_count}}</span>
+                                    <span class="views">{{votes}}</span>
                                     <img class="to-down" @click.once="toDown" src="\images\arrow-down.svg">
+                                </div>
+                                <div v-else-if="post.voted_users[0].vote_type === 'TOP'" class="bottom-up-down-bar d-flex d-md-none">
+                                    <img class="to-top"  src="\images\arrow-up.svg">
+                                    <span class="views">{{votes}}</span>
+                                </div>
+                                <div v-else-if="post.voted_users[0].vote_type === 'DOWN'" class="bottom-up-down-bar d-flex d-md-none">
+                                    <span class="views">{{votes}}</span>
+                                    <img class="to-down"  src="\images\arrow-down.svg">
                                 </div>
                                 <img class="comment-img mx-1" src="\images\comment.svg">
                                 <span class="comment-count p-1">{{post.comments_count}} comments</span>
@@ -81,6 +97,8 @@
                                     :view_count="value.view_count"
                                     :user="value.user"
                                     :date="value.date"
+                                    :to_top = "value.to_top"
+                                    :to_down = "value.to_down"
                                     :text="value.text"
                                     :id="value.id"/>
                         </div>
@@ -101,7 +119,9 @@
                             :user = "post.user"
                             :community="community"
                             :comments_count = "post.comments_count"
-                            :view_count = "post.view_count"
+                            :to_top = "post.to_top"
+                            :voted="post.voted_users"
+                            :to_down = "post.to_down"
                             :post_id = "post.id"
                             :title = "post.title"/>
                 </div>
@@ -173,10 +193,12 @@
                 post : {
                     body : '',
                     title : '',
-                    view_count : 0,
+                    to_top : 0,
+                    to_down : 0,
                     comments_count : 0,
                     user : {},
                     created_at : 0,
+                    voted_users:[]
                 },
                 community : {
                     name : '',
@@ -251,8 +273,6 @@
             getNextPosts(){
                 let posts_next_page = this.next_page_posts_url;
 
-                console.log(this.next_page_posts_url);
-
                 if(this.isBottom() && posts_next_page !== null) {
                     window.removeEventListener('scroll', this.getNextPosts)
                     axios.get(posts_next_page)
@@ -270,11 +290,17 @@
             setGeneral(generalDataObj){
 
                 this.post = generalDataObj.data.main_post;
+
+                if(generalDataObj.data.main_post.voted_users === undefined){
+                    this.post.voted_users = [];
+                }
+
                 this.other_posts = generalDataObj.data.other_posts;
                 this.next_page_posts_url = generalDataObj.data.next_page_posts;
 
                 this.showCommentInput = !generalDataObj.data.has_comment;
                 this.community = generalDataObj.data.main_post.community;
+
                 if(!(this.isJoined = generalDataObj.data.is_joined) || !this.$store.getters.isAuth){
                     document.getElementById('join').disabled = false;
                 }
@@ -324,7 +350,7 @@
             doToTop() {
                 let selector = 'div.row.col-12.px-0 .to-down',
                     downArrows = document.querySelectorAll(selector);
-                this.post.view_count +=1;
+                this.post.to_down +=1;
                 downArrows.forEach(function (value){
                     value.style.display = 'none'
                 });
@@ -334,7 +360,7 @@
                 let selector = 'div.row.col-12.px-0 .to-top',
                     upArrows = document.querySelectorAll(selector);
                 console.log(upArrows);
-                this.post.view_count -=1;
+                this.post.to_down +=1;
                 upArrows.forEach(function (value){
                     value.style.display = 'none'
                 });
@@ -353,7 +379,7 @@
             },
 
             toTop(){
-                axios.post(`/api/post/${this.Id}/up`)
+                axios.patch(`/api/post/${this.Id}/up`)
                 .then(this.doToTop)
                 .catch(error => {
                     console.log(error);
@@ -361,7 +387,7 @@
             },
 
             toDown(){
-                axios.post(`/api/post/${this.Id}/up`)
+                axios.patch(`/api/post/${this.Id}/up`)
                 .then(this.doToDown)
                 .catch(error => {
                     console.log(error);
@@ -384,6 +410,9 @@
             },
             isAuth(){
                 return this.$store.getters.isAuth;
+            },
+            votes(){
+                return this.post.to_top - this.post.to_down
             }
         },
         watch:{

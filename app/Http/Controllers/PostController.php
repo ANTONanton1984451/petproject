@@ -36,8 +36,17 @@ class PostController extends Controller
         }catch (ModelNotFoundException $e){
             return response('Этот пост не существует',404);
         }
-        $postInstance->increment('to_top');
-        return response('',204);
+
+        if(!$postInstance->alreadyVoted(Auth::id())){
+            $postInstance->increment('to_top');
+            $postInstance->votedUsers()->attach(Auth::id(),['vote_type'=>'TOP']);
+
+            $response = response('',204);
+        }else{
+            $response = response('Вы уже ставили оценку',406);
+        }
+
+        return $response;
     }
 
     public function postDown($postId)
@@ -47,7 +56,16 @@ class PostController extends Controller
         }catch (ModelNotFoundException $e){
             return response('Этот пост не существует',404);
         }
-        $postInstance->increment('to_down');
-        return response('',204);
+
+        if(!$postInstance->alreadyVoted(Auth::id())){
+            $postInstance->increment('to_down');
+            $postInstance->votedUsers()->attach(Auth::id(),['vote_type'=>'DOWN']);
+
+            $response = response('',204);
+        }else{
+            $response = response('Вы уже ставили оценку',406);
+        }
+
+        return $response;
     }
 }

@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LentaController extends Controller
 {
     private const PAGINATE_LIMIT = 10;
     //todo::Продумать,ситуацию,где у пользователя нет ни одной подписки
-    public function getLenta(Request $request)
+    public function getLenta()
     {
         $posts = Auth::check() ? $this->getPostsForAuth() : $this->getPostsForGuest();
 
@@ -31,8 +29,11 @@ class LentaController extends Controller
                                         ->pluck('pivot.community_id')
                                         ->toArray();
 
-        $posts = Post::forAuth($subscriptionsIdList,$banPostsIdList)
-                ->with(['user:id,name','community:id,name'])
+
+        //todo :: Здесь возникает небольшой костыль,в виде массива отношения votedUsers
+        // с одним только элементом это происходит потому что связь многие ко многим и Laravel создаёт масссив массивов,
+        //однако в подмассивах только один элемент
+        $posts = Post::forAuth($subscriptionsIdList,$banPostsIdList,Auth::id())
                 ->limit(self::PAGINATE_LIMIT);
 
         return $posts;

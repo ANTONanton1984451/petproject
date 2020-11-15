@@ -54,7 +54,7 @@ class CommentController extends Controller
     public function addComment(Request $request,$tredId)
     {
         if(!Comment::alreadyHas(Auth::id(),$tredId)){
-
+            //todo :: Регулярки
             $validator = Validator::make($request->only('text'),[
                 'text'=>['required','min:0','max:150']
             ]);

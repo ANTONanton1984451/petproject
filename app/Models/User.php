@@ -59,6 +59,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Post::class,'ban_lists')->withTimestamps();
     }
 
+    public function votes()
+    {
+        return $this->belongsToMany(Post::class,'votes')->withTimestamps();
+    }
+
     public function subscriptions()
     {
         return $this->belongsToMany(Community::class,'subscriptions');
