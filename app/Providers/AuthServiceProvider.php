@@ -25,6 +25,15 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        $gateFunction = function ($user,int $savedPostId){
+            return $user->savedPosts()
+                ->where('saved_posts.id','=',$savedPostId)
+                ->get()
+                ->isNotEmpty();
+        };
+
+        Gate::define('update-saved-post',$gateFunction);
+        Gate::define('delete-save-post',$gateFunction);
+        Gate::define('get-saved',$gateFunction);
     }
 }

@@ -41,4 +41,10 @@ class Community extends Model
                     ->select(['name','id']);
     }
 
+    public function scopeSearch($query,string $searchValue,int $limit)
+    {
+        return $query->select(['name','id'])->where('name','like',"%$searchValue%")
+            ->limit($limit);
+    }
+
 }

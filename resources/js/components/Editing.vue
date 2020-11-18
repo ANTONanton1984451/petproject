@@ -73,10 +73,12 @@ export default {
               showSearchResults:false,
               body:'',
               title:'',
+              savedId:0,
               notificationMessage:'',
               searchTarget:[],
               communityForSend:'',
               communityForSendId:0,
+              searchInputCommunity : '',
               customToolBar:[
                     ['bold','italic','underline','strike'],
                     [{'align':''},{'align':'center'},{'align':'right'}],
@@ -89,8 +91,15 @@ export default {
     methods:{
       savePost(){
         if(this.title !== '' && this.body !== ''){
-            let body = JSON.stringify({body:this.body,
-                                            title:this.title});
+            let body = {body:this.body,
+                        title:this.title};
+            if(this.$route.query.postId !== undefined){
+                body.id = this.$route.query.postId;
+            }
+            if(this.savedId !== 0){
+                body.id = this.savedId;
+            }
+            body = JSON.stringify(body);
             axios.patch('/api/post/save',body,{
                 headers : {
                     'Content-Type': 'application/json',
@@ -100,6 +109,7 @@ export default {
       },
       handleSaveResponse(saveResponseObj){
           this.notificationMessage = 'Сохранено!';
+          this.savedId = saveResponseObj.data.id;
           let modalNotification = document.getElementById('notification');
           modalNotification.style.display = 'block';
           setTimeout(function (){
@@ -121,7 +131,8 @@ export default {
         this.showSearchResults = false;
       },
       deletePost(){
-        axios.delete(`/api/post/saved/${this.$route.query.postId}`)
+          //todo :: это неверно
+        axios.delete(`/api/saved/${this.$route.query.postId}`)
         .then(this.handleDeletePostResponse)
         .catch(error => {
            console.log(error);
@@ -176,8 +187,9 @@ export default {
              e.target.value = e.target.value.slice(0,-1);
              alert('Слишком длинное название!');
           }
-          if(searchValue !== ''){
-              axios.get('/api/community/search?limit=5')
+          if(searchValue !== '' && searchValue !== this.searchInputCommunity){
+              this.searchInputCommunity = searchValue;
+              axios.get(`/api/community/search/${searchValue}?limit=5`)
               .then(this.handleSearchResponse)
               .catch();
           }

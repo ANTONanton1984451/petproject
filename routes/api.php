@@ -68,55 +68,19 @@ Route::middleware(AUTH_MIDDLEWARE)->post('/community',[\App\Http\Controllers\Com
 
 //********************************CreatePost***********************
 
-Route::get('/community/search',function (Request $request) {
-    return [
-        ['name'=>'test','id'=>1],
-        ['name'=>'test_2','id'=>2]
-    ];
-});
+Route::middleware(AUTH_MIDDLEWARE)->get('/community/search/{searchValue}',[\App\Http\Controllers\CommunityController::class,'search']);
 
-Route::get('/post/{id}/saved',function($id) {
-    return [
-        'title'=>'test',
-        'body'=>'test_body'
-    ];
-});
-
+Route::middleware(AUTH_MIDDLEWARE)->get('/post/{id}/saved',[\App\Http\Controllers\SavedController::class,'getSaved']);
+//todo :: недоделано
 Route::post('/post/publish',[\App\Http\Controllers\PostController::class,'dispatchHandler']);
 
-Route::patch('/post/save',function (Request $request) {
-    return ['status'=>$request->all()];
-});
-
-Route::delete('/post/saved/{savedPostId}',function (Request $request) {
-    return ['ok'];
-});
+Route::middleware(AUTH_MIDDLEWARE)->patch('/post/save',[\App\Http\Controllers\PostController::class,'save']);
 
 //*************************** Saved *********************************
 
-Route::get('/saved/preview',function (Request  $request) {
-    return [
-        ['title'=>'test',
-            'body'=>str_repeat('test',200),
-            'last_update_time'=>123123123,
-            'id'=>1],
-        ['title'=>'test2',
-            'body'=>'test_body2',
-            'last_update_time'=>123123123,
-            'id'=>2],
-        ['title'=>'test3',
-            'body'=>'test_body3',
-            'last_update_time'=>123123123,
-            'id'=>3],
-        ['title'=>'test4',
-            'body'=>'test_body4',
-            'last_update_time'=>123123123,
-            'id'=>4]
-    ];
-});
-Route::delete('/saved/{id}',function ($id){
-    return "Удалю по этому Айди : ".$id;
-});
+Route::middleware(AUTH_MIDDLEWARE)->get('/saved/preview',[\App\Http\Controllers\SavedController::class,'getPreview']);
+
+Route::middleware(AUTH_MIDDLEWARE)->delete('/saved/{id}',[\App\Http\Controllers\SavedController::class,'deleteSavedPost']);
 
 //******************InQueue***********************8
 Route::get('/in_queue',function(Request $request) {
@@ -157,12 +121,12 @@ Route::get('/statistic',function (Request $request) {
 });
 //************************** NEW|HOT|TOP *********************
 Route::get('/{type}/new',function (){
-    $posts = [
-        ['user'=>'test','date'=>123,'comments_count'=>45,'view_count'=>34,'title'=>'test_title','post_id'=>1],
-        ['user'=>'test2','date'=>1235,'comments_count'=>455,'view_count'=>343,'title'=>'test_title2','post_id'=>2],
-        ['user'=>'test3','date'=>3500,'comments_count'=>5,'view_count'=>56,'title'=>'test_title3','post_id'=>3],
-    ];
-   return $posts;
+//    $posts = [
+//        ['user'=>'test','date'=>123,'comments_count'=>45,'view_count'=>34,'title'=>'test_title','post_id'=>1],
+//        ['user'=>'test2','date'=>1235,'comments_count'=>455,'view_count'=>343,'title'=>'test_title2','post_id'=>2],
+//        ['user'=>'test3','date'=>3500,'comments_count'=>5,'view_count'=>56,'title'=>'test_title3','post_id'=>3],
+//    ];
+   return [];
 });
 
 Route::get('/{type}/top',function (){

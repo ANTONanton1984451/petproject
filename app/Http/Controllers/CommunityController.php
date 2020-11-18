@@ -64,4 +64,20 @@ class CommunityController extends Controller
     {
         return Community::popular()->limit(5)->get()->toArray();
     }
+    public function search(Request $request,string $searchValue)
+    {
+        //todo :: Регулярки!!!!!
+        $validation = Validator::make(['searchValue'=>$searchValue,
+                                        'limit'=>$request->query('limit')],
+                                      ['searchValue'=>['string'],
+                                          'limit'=>['integer']]);
+
+        if(!$validation->fails()){
+          $communityList = Community::search($searchValue,$request->query('limit'))->get();
+          $response = response($communityList);
+        }else{
+          $response = response('Invalid inputs',406);
+        }
+        return $response;
+    }
 }

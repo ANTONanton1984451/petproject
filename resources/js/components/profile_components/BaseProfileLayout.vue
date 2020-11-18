@@ -11,7 +11,7 @@
             </span>
         </div>
         <div class="row profile-nav" :class="[toggleBackGround,toggleTextColor]">
-                <profile-nav :host="isHost" :userName="userName"/>
+                <profile-nav :userName="userName"/>
         </div>
         <div class="col-md-10 col-12 mt-3 row justify-content-around">
             <div class="col sort-wrapper " :class="[toggleTextColor]">
@@ -78,9 +78,6 @@
             userName(){
                return  this.$route.params.username;
             },
-            isHost(){
-                return this.$route.params.username === this.$store.getters.getNickName
-            }
         },
         watch:{
             $route(to){

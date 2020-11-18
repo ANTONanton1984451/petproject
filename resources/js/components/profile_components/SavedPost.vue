@@ -9,7 +9,7 @@
             Длина: {{textLength}}
         </div>
         <div class="date">
-            Последнее изменение: {{post.last_update_time|formDate}}
+            Последнее изменение: {{post.updated_at|formNotTimestampDate}}
         </div>
         <post-view :post="post"
                    v-show="showPostView"

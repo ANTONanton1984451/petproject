@@ -19,8 +19,7 @@
                     <div class="title">
                         {{post.title}}
                     </div>
-                    <div class="post-body">
-                        {{post.body}}
+                    <div class="post-body" v-html="post.body">
                     </div>
                 </div>
             </div>

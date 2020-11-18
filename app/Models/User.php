@@ -16,6 +16,7 @@ class User extends Authenticatable
      *
      * @var array
      */
+    //todo :: Убрать fillable и сделать сеттер к паролю
     protected $fillable = [
         'name',
         'email',
@@ -72,6 +73,11 @@ class User extends Authenticatable
     public function subscriptions()
     {
         return $this->belongsToMany(Community::class,'subscriptions');
+    }
+
+    public function savedPosts()
+    {
+        return $this->hasMany(SavedPost::class);
     }
 
     public function scopeSecure($query)

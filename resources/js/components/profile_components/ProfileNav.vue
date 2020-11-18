@@ -18,7 +18,7 @@
                      active-class="active-path">
             Комменты
         </router-link>
-        <router-link v-if=host
+        <router-link v-if="authUser == userName"
                      tag="strong"
                      class="col profile-link"
                      :to="{name:'profile.saved',params:{username:'test'}}"
@@ -30,12 +30,17 @@
 
 <script>
     export default {
-        props:['host','userName'],
+        props:['userName'],
         name: "ProfileNav",
         data(){
             return{
 
             }
+        },
+        computed : {
+           authUser(){
+               return this.$store.getters.getID;
+           }
         },
         mounted() {
           console.log(this.userName)
