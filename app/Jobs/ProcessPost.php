@@ -40,6 +40,6 @@ class ProcessPost implements ShouldQueue
      */
     public function handle()
     {
-                
+
     }
 }
