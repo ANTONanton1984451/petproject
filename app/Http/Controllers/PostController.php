@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PublishPostRequest;
+use App\Jobs\HandlerPost;
 use App\Models\Post;
 use App\Models\SavedPost;
+use App\Wrappers\NonHandledPostWrapper;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -21,7 +24,7 @@ class PostController extends Controller
             return response('',404);
         }
 
-        $isBanned = $postInstance->banners()->where('user_id',Auth::id())->get()->isNotEmpty();
+        $isBanned = $postInstance->alreadyBanned(Auth::id());
 
         if(!$isBanned){
             $postInstance->banners()->attach(Auth::id());
@@ -90,6 +93,19 @@ class PostController extends Controller
         return $response;
     }
 
+    public function publish(PublishPostRequest $request,NonHandledPostWrapper $wrapper)
+    {
+            $validatedInput = $request->validated();
+            $wrapper->setPostTitle($validatedInput['title']);
+            $wrapper->setPostBody($validatedInput['body']);
+            $wrapper->setCommunityId($validatedInput['communityForSendId']);
+            $wrapper->setUserId(Auth::id());
+
+            HandlerPost::dispatch($wrapper);
+
+            return response('',204);
+    }
+
     private function saveNew(array $inputs)
     {
         $savedPostsInstance = Auth::user()->savedPosts()->save(new SavedPost([
@@ -110,4 +126,5 @@ class PostController extends Controller
 
         return response($savedPosts,200);
     }
+
 }

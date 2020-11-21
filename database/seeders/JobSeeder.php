@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Jobs\ProcessPost;
+use App\Jobs\HandlerPost;
+use App\Wrappers\NonHandledPostWrapper;
 use Illuminate\Database\Seeder;
 
 class JobSeeder extends Seeder
@@ -14,6 +15,6 @@ class JobSeeder extends Seeder
      */
     public function run()
     {
-        ProcessPost::dispatch('test','test',1,1)->delay(5);
+        HandlerPost::dispatch(new NonHandledPostWrapper(1,1,1,1,))->delay(5);
     }
 }

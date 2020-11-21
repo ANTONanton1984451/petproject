@@ -100,4 +100,12 @@ class Post extends Model
                     ->get()
                     ->isNotEmpty();
     }
+
+    public function scopeAlreadyBanned($query,int $userId):bool
+    {
+        return $this->belongsToMany(User::class,'ban_lists')
+                    ->where('user_id',$userId)
+                    ->get()
+                    ->isNotEmpty();
+    }
 }

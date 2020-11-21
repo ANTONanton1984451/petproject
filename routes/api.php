@@ -72,7 +72,7 @@ Route::middleware(AUTH_MIDDLEWARE)->get('/community/search/{searchValue}',[\App\
 
 Route::middleware(AUTH_MIDDLEWARE)->get('/post/{id}/saved',[\App\Http\Controllers\SavedController::class,'getSaved']);
 //todo :: недоделано
-Route::post('/post/publish',[\App\Http\Controllers\PostController::class,'dispatchHandler']);
+Route::middleware(AUTH_MIDDLEWARE)->post('/post/publish',[\App\Http\Controllers\PostController::class,'publish']);
 
 Route::middleware(AUTH_MIDDLEWARE)->patch('/post/save',[\App\Http\Controllers\PostController::class,'save']);
 

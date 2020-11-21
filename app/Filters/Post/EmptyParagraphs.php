@@ -4,22 +4,23 @@
 namespace App\Filters\Post;
 
 
-use App\Interfaces\Decorator\Post\ConcreteComponent;
-use App\Interfaces\Decorator\Post\Decorator;
-use App\Wrappers\NonProcessPostWrapper;
+use App\Contracts\Decorator\Post\ConcreteHandler;
+use App\Contracts\Decorator\Post\DecoratorFilter;
+use App\Wrappers\NonHandledPostWrapper;
+use Symfony\Component\DomCrawler\Crawler;
 
-class EmptyParagraphs implements Decorator
+class EmptyParagraphs implements DecoratorFilter
 {
-    private ConcreteComponent $filter;
+    private ConcreteHandler $handler;
 
-    public function __construct(ConcreteComponent $filter)
+    public function __construct(ConcreteHandler $handler)
     {
-        $this->filter = $filter;
+        $this->handler = $handler;
     }
 
-    public function process(NonProcessPostWrapper $postWrapper): NonProcessPostWrapper
+    public function process(NonHandledPostWrapper $postWrapper): NonHandledPostWrapper
     {
-        $this->filter->process($postWrapper);
+        $this->handler->process($postWrapper);
         return $postWrapper;
     }
 }
