@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Contracts\Decorator\Post\DecoratorFilter;
+use App\Contracts\Decorator\Post\DecoratorHandler;
 use App\Wrappers\NonHandledPostWrapper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,10 +29,10 @@ class HandlerPost implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @param DecoratorFilter $filter
+     * @param DecoratorHandler $filter
      * @return void
      */
-    public function handle(DecoratorFilter $filter)
+    public function handle(DecoratorHandler $filter)
     {
             $filter->process($this->postWrapper);
     }

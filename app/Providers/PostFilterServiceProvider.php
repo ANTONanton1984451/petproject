@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 
+use App\Checkers\HttpOnlyLinks;
 use App\DecoratorConcrete\Post\ModelBridge;
 use App\Filters\Post\EmptyParagraphs;
 use App\Filters\Post\SpecialTags;
@@ -32,7 +33,7 @@ class PostFilterServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->bindMethod(HandlerPost::class.'@handle',function ($job,$app){
-            return $job->handle(new SpecialTags(new EmptyParagraphs(new ModelBridge())));
+            return $job->handle(new HttpOnlyLinks(new EmptyParagraphs(new SpecialTags(new ModelBridge()))));
         });
     }
 }

@@ -5,11 +5,11 @@ namespace App\Filters\Post;
 
 
 use App\Contracts\Decorator\Post\ConcreteHandler;
-use App\Contracts\Decorator\Post\DecoratorFilter;
+use App\Contracts\Decorator\Post\DecoratorHandler;
 use App\Wrappers\NonHandledPostWrapper;
-use Symfony\Component\DomCrawler\Crawler;
 
-class EmptyParagraphs implements DecoratorFilter
+
+class EmptyParagraphs implements DecoratorHandler
 {
     private ConcreteHandler $handler;
 
@@ -18,9 +18,8 @@ class EmptyParagraphs implements DecoratorFilter
         $this->handler = $handler;
     }
 
-    public function process(NonHandledPostWrapper $postWrapper): NonHandledPostWrapper
+    public function process(NonHandledPostWrapper $postWrapper) : void
     {
-        $this->handler->process($postWrapper);
-        return $postWrapper;
+       $this->handler->process($postWrapper);
     }
 }

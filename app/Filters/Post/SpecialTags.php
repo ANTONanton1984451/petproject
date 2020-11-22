@@ -6,10 +6,11 @@ namespace App\Filters\Post;
 
 
 use App\Contracts\Decorator\Post\ConcreteHandler;
-use App\Contracts\Decorator\Post\DecoratorFilter;
+use App\Contracts\Decorator\Post\DecoratorHandler;
+use App\Parser\Parser;
 use App\Wrappers\NonHandledPostWrapper;
 
-class SpecialTags implements DecoratorFilter
+class SpecialTags implements DecoratorHandler
 {
     private ConcreteHandler $handler;
 
@@ -18,9 +19,9 @@ class SpecialTags implements DecoratorFilter
         $this->handler = $handler;
     }
 
-    public function process(NonHandledPostWrapper $postWrapper): NonHandledPostWrapper
+    public function process(NonHandledPostWrapper $postWrapper) : void
     {
+        $parser = Parser::getFacadeRoot();
         $this->handler->process($postWrapper);
-        return $postWrapper;
     }
 }
